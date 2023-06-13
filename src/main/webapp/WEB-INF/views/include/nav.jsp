@@ -17,6 +17,8 @@
         <a href="${ctp}/study/password/sha256" class="w3-bar-item w3-button">암호화(SHA256)</a>
         <a href="${ctp}/study/password/aria" class="w3-bar-item w3-button">암호화(ARIA)</a>
         <a href="${ctp}/study/password/bCryptPassword" class="w3-bar-item w3-button">암호화(Security)</a>
+        <a href="${ctp}/study/mail/mailForm" class="w3-bar-item w3-button">이메일</a>
+        <a href="${ctp}/study/uuid/uuidForm" class="w3-bar-item w3-button">UUID연습</a>
       </div>
     </div>
     <c:if test="${empty sLevel}">
@@ -35,6 +37,7 @@
   <a href="${ctp}/guest/guestList" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">Guest</a>
   <a href="#tour" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">Board</a>
   <a href="#contact" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">Pds</a>
+  <a href="${ctp}/study/mail/mailForm" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">Mail</a>
   <hr/>
   <a href="${ctp}/study/password/sha256" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">Sha256</a>
   <a href="${ctp}/study/password/aria" class="w3-bar-item w3-button w3-padding-large" onclick="myFunction()">ARIA</a>
