@@ -111,7 +111,7 @@
     	
   		// 전송전에 파일에 관한 사항체크...(회원사진의 내역이 비었으면 noimage를 hidden필드인 photo필드에 담아서 전송한다.)
   		if(fName.trim() == "") {
-  			myform.photo.value = "noimage";
+  			myform.photo.value = "noimage.jpg";
 				submitFlag = 1;
   		}
   		else {
@@ -150,6 +150,7 @@
     					hobbys += document.getElementsByName("hobby")[i].value + "/";
     				}
     			}
+    			//alert("hobbys : " + hobbys);
     			
 	    		myform.email.value = email;
 	    		myform.tel.value = tel;
@@ -226,7 +227,7 @@
 <p><br/></p>
 <div class="container">
   <%-- <form name="myform" method="post" action="${ctp}/member/memberJoinOk" class="was-validated" enctype="multipart/form-data"> --%>
-  <form name="myform" method="post" class="was-validated">
+  <form name="myform" method="post" class="was-validated" enctype="multipart/form-data">
     <h2>회 원 가 입</h2>
     <br/>
     <div class="form-group">

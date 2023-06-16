@@ -9,7 +9,7 @@ import com.spring.javawebS.dao.GuestDAO;
 import com.spring.javawebS.vo.GuestVO;
 
 @Service
-public class GuestServieImpl implements GuestService {
+public class GuestServiceImpl implements GuestService {
 
 	@Autowired
 	GuestDAO guestDAO;
@@ -26,8 +26,8 @@ public class GuestServieImpl implements GuestService {
 
 	@Override
 	public int getAdminCheck(String mid, String pwd) {
-		int res=0;
-		if(mid.equals("admin") && pwd.equals("1234")) return res=1;
+		int res = 0;
+		if(mid.equals("admin") && pwd.equals("1234")) res = 1;
 		return res;
 	}
 

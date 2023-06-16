@@ -18,6 +18,10 @@
 	<resources mapping="/css/**" location="/resources/css/" />
 	<resources mapping="/font/**" location="/resources/font/" />
 	<resources mapping="/images/**" location="/resources/images/" />
+	<resources mapping="/member/**" location="/resources/data/member/" />
+	<resources mapping="/board/**" location="/resources/data/board/" />
+	<resources mapping="/ckeditor/**" location="/resources/ckeditor/" />
+	<resources mapping="/data/**" location="/resources/data/" />
 
 	<!-- Resolves views selected for rendering by @Controllers to .jsp resources in the /WEB-INF/views directory -->
 	<beans:bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
@@ -29,6 +33,62 @@
 	
 	<!-- Spring Security의 BCryptPasswordEncoder 객체를 Bean으로 등록 -->
   <beans:bean id="bCryptPasswordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder" />
+	
+	<!-- 파일 업로드에 필요한 라이브러리를 Bean으로 등록(업로드 최대용량 : 20MByte) -->
+	<beans:bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<beans:property name="maxUploadSize" value="20971520" />
+		<beans:property name="defaultEncoding" value="utf-8" />
+	</beans:bean>
+	
+	
+	<!-- Interceptor 설정 -->
+	<beans:bean id="level0Interceptor" class="com.spring.javawebS.interceptor.Level0Interceptor" />
+	<beans:bean id="level1Interceptor" class="com.spring.javawebS.interceptor.Level1Interceptor" />
+	<beans:bean id="level2Interceptor" class="com.spring.javawebS.interceptor.Level2Interceptor" />
+	<beans:bean id="level3Interceptor" class="com.spring.javawebS.interceptor.Level3Interceptor" />
+	<!-- 
+		관리자는 /admin으로 들어왔을 경우에만 허용.
+		기본은 board는 정회원부터 허용, 단	boardLsit는 준회원 허용
+		기본은 pds는 우수회원부터 허용, 단 pdsList,pdsDownload는 정회원까지 허용
+	 -->
+	<interceptors>
+	  <interceptor>
+	    <mapping path="/admin/**"/>
+	    <beans:ref bean="level0Interceptor" />
+	  </interceptor>
+	  
+	  <interceptor>
+	    <mapping path="/member/**"/>
+	    <mapping path="/board/boardList" />
+	    <exclude-mapping path="/member/memberLogin" />
+	    <exclude-mapping path="/member/memberLogout" />
+	    <exclude-mapping path="/member/memberJoin" />
+	    <exclude-mapping path="/member/memberIdCheck" />
+	    <exclude-mapping path="/member/memberNickCheck" />
+	    <exclude-mapping path="/member/memberIdFind" />
+	    <exclude-mapping path="/member/memberPwdFind" />
+	    <exclude-mapping path="/member/memberIdFind" />
+	    <exclude-mapping path="/member/memberIdFindOk" />
+	    <beans:ref bean="level3Interceptor" />
+	  </interceptor>
+	  
+	  <interceptor>
+	    <mapping path="/study/**"/>
+	    <mapping path="/board/**"/>
+	    <mapping path="/pds/pdsList"/>
+	    <mapping path="/pds/pdsDownLoad"/>
+	    <exclude-mapping path="/board/boardList" />
+	    <beans:ref bean="level2Interceptor" />
+	  </interceptor>
+	  
+	  <interceptor>
+	    <mapping path="/pds/**"/>
+	    <exclude-mapping path="/pds/pdsList" />
+	    <exclude-mapping path="/pds/pdsDownLoad" />
+	    <beans:ref bean="level1Interceptor" />
+	  </interceptor>
+	  
+	</interceptors>
 	
 	
 </beans:beans>

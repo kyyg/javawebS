@@ -7,7 +7,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>memberLogin.jsp</title>
-<jsp:include page="/WEB-INF/views/include/bs4.jsp" />
+  <jsp:include page="/WEB-INF/views/include/bs4.jsp" />
 </head>
 <body>
 <jsp:include page="/WEB-INF/views/include/nav.jsp" />
@@ -40,8 +40,8 @@
 		    <div class="row text-center" style="font-size:12px">
 		      <span class="col"><input type="checkbox" name="idSave" checked />아이디 저장</span>
 		      <span class="col">
-		        [<a href="#">아이디찾기</a>] /
-		        [<a href="#">비밀번호찾기</a>]
+		        [<a href="${ctp}/member/memberIdFind">아이디찾기</a>] /
+		        [<a href="${ctp}/member/memberPwdFind">비밀번호찾기</a>]
 		      </span>
 		    </div>
 		  </form>

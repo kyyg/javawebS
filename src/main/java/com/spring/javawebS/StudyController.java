@@ -1,12 +1,20 @@
 package com.spring.javawebS;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
@@ -14,19 +22,23 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.spring.javawebS.common.ARIAUtil;
 import com.spring.javawebS.common.SecurityUtil;
 import com.spring.javawebS.service.StudyService;
 import com.spring.javawebS.vo.MailVO;
+import com.spring.javawebS.vo.MemberVO;
 
 @Controller
 @RequestMapping("/study")
 public class StudyController {
-
+	
 	@Autowired
 	StudyService studyService;
 	
@@ -91,11 +103,15 @@ public class StudyController {
 	}
 	
 	
-	// 메일 연습 폼
-	@RequestMapping(value = "/mail/mailForm", method = RequestMethod.GET)
-	public String mailFormGet() {
-		return "study/mail/mailForm";
-	}
+	//메일 연습 폼
+  @RequestMapping(value = "/mail/mailForm", method = RequestMethod.GET)
+  public String mailFormGet(Model model) {
+    List<MemberVO> vos = studyService.getEmailList();
+    
+    model.addAttribute("vos",vos);
+    return "study/mail/mailForm";
+  }
+
 	
 	// 메일 전송하기
 	@RequestMapping(value = "/mail/mailForm", method = RequestMethod.POST)
@@ -109,7 +125,7 @@ public class StudyController {
 	MimeMessageHelper messageHelper = new MimeMessageHelper(message, true, "UTF-8");
 		
 	// 메일 보관함에 회원이 보내온 메세지들의 정보를 모두 저장시킨 후 작업처리 한다.
-	messageHelper.setTo(toMail);
+	messageHelper.setTo(toMail.split(";"));
 	messageHelper.setSubject(title);
 	messageHelper.setText(content);
 	
@@ -157,6 +173,177 @@ public class StudyController {
 		UUID uid = UUID.randomUUID();
 		return uid.toString();
 	}
+	
+	
+	
+	@RequestMapping(value = "/ajax/ajaxForm", method = RequestMethod.GET)
+	public String ajaxFormGet() {
+		return "study/ajax/ajaxForm";
+	}
+	
+	@ResponseBody
+	@RequestMapping(value = "/ajax/ajaxTest1", method = RequestMethod.POST, produces="application/text; charset=utf-8")
+	public String ajaxTest1Post(int idx) {
+		idx = (int)(Math.random()*idx) + 1;
+		return idx + " : Have a good time!(제 한글이.. 보이시나여?.. produces=\"application/text; charset=utf-8\")";
+	}
+	
+	@RequestMapping(value = "/ajax/ajaxTest2_1", method = RequestMethod.GET)
+	public String ajaxTest2_1Get() {
+		return "study/ajax/ajaxTest2_1";
+	}
+	
+	// 일반 배열값의 전달
+	@ResponseBody
+	@RequestMapping(value = "/ajax/ajaxTest2_1", method = RequestMethod.POST)
+	public String[] ajaxTest2_1Posst(String dodo) {
+		/*
+		 * String[] strArray = new String[100]; strArray =
+		 * studyService.getCityStringArray(dodo); 
+		 * return strArray;
+		 */
+		return studyService.getCityStringArray(dodo);
+	}
+	
+	// 객체배열(ArrayList)값의 전달 폼
+	@RequestMapping(value = "/ajax/ajaxTest2_2", method = RequestMethod.GET)
+	public String ajaxTest2_2Get() {
+		return "study/ajax/ajaxTest2_2";
+	}
+	
+	// 객체배열(ArrayList)값의 전달 폼
+	@ResponseBody
+	@RequestMapping(value = "/ajax/ajaxTest2_2", method = RequestMethod.POST)
+	public ArrayList<String> ajaxTest2_2Post(String dodo) {
+		return studyService.getCityArrayList(dodo);
+	}
+	
+	// Map(Hash Map<k,v>)값의 전달 폼
+	@RequestMapping(value = "/ajax/ajaxTest2_3", method = RequestMethod.GET)
+	public String ajaxTest2_3Get() {
+		return "study/ajax/ajaxTest2_3";
+	}
+	
+//Map(Hash Map<k,v>)값의 전달 폼
+	@ResponseBody
+	@RequestMapping(value = "/ajax/ajaxTest2_3", method = RequestMethod.POST)
+	public HashMap<Object, Object> ajaxTest2_3Post(String dodo) {
+		ArrayList<String> vos = new ArrayList<String>();
+		vos = studyService.getCityArrayList(dodo);
+		
+		HashMap<Object, Object> map = new HashMap<Object, Object>();
+		map.put("city", vos);
+		
+		return map;
+	}
+	
+	//DB를 활용한 값의 전달 폼
+	@RequestMapping(value = "/ajax/ajaxTest3", method = RequestMethod.GET)
+	public String ajaxTest3Get() {
+		return "study/ajax/ajaxTest3";
+	}
+	
+	// DB를 활용한 값의 전달 폼(vo사용)
+	@ResponseBody
+	@RequestMapping(value = "/ajax/ajaxTest3_1", method = RequestMethod.POST)
+	public MemberVO ajaxTest3_1Post(String name) {
+		System.out.println("name: " + name);
+		return studyService.getMemberMidSearch(name);
+	}
+	
+	// DB를 활용한 값의 전달 폼(vos사용)
+	@ResponseBody
+	@RequestMapping(value = "/ajax/ajaxTest3_2", method = RequestMethod.POST)
+	public ArrayList<MemberVO> ajaxTest3_2Post(String name) {
+		return studyService.getMemberMidSearch2(name);
+	}
+	
+	
+	
+	// 파일 업로드 폼
+	/*
+	@RequestMapping(value = "fileUpload/fileUploadForm", method = RequestMethod.GET)
+	public String fileUploadGet() {
+		return "study/fileUpload/fileUploadForm";
+	}
+	*/
+	
+	@RequestMapping(value = "fileUpload/fileUploadForm", method = RequestMethod.GET)
+	public String fileUploadGet(HttpServletRequest request, Model model) {
+		String realPath = request.getSession().getServletContext().getRealPath("/resources/data/study");
+		
+		String[] files = new File(realPath).list();
+		
+		//for(String file : files) {
+			//System.out.println("file : " + file);
+		//}
+		
+		model.addAttribute("files", files);
+		model.addAttribute("fileCount", files.length);
+		
+		return "study/fileUpload/fileUploadForm";
+	}
+	
+	
+	// 파일 업로드
+	@RequestMapping(value = "fileUpload/fileUploadForm", method = RequestMethod.POST)
+	public String fileUploadPost(MultipartFile fName, String mid) {
+		// System.out.println("fName : " + fName);
+		// System.out.println("mid : " + mid);
+		
+		int res = studyService.fileUpload(fName, mid);
+		
+		if(res == 1) return "redirect:/message/fileUploadOk";
+		else return "redirect:/message/fileUploadNo";
+	}
+	
+	// 파일 삭제
+	@ResponseBody
+	@RequestMapping(value = "/fileUpload/fileDelete",  method = RequestMethod.POST)
+	public String fileDelete(
+			@RequestParam(name="file", defaultValue = "", required=false) String fName,
+			HttpServletRequest request) {
+		String realPath = request.getSession().getServletContext().getRealPath("/resources/data/study/");
+		
+		String res = "0";
+		File file = new File(realPath + fName);
+		
+		if(file.exists()) {
+			file.delete();
+			res = "1";
+		}
+		
+		return res;
+	}
+	
+	// 파일 다운로드 메소드...
+	@RequestMapping(value = "fileUpload/fileDownAction", method = RequestMethod.GET)
+	public void fileDownActionGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		String file = request.getParameter("file");
+		String realPath = request.getSession().getServletContext().getRealPath("/resources/data/study/");
+		
+		File downFile = new File(realPath + file);
+		
+		String downFileName = new String(file.getBytes("UTF-8"),"8859_1");		
+		
+		response.setHeader("Content-Disposition", "attachment:filename=" + downFileName);
+		
+		FileInputStream fis = new FileInputStream(downFile);
+		ServletOutputStream sos = response.getOutputStream();
+		
+		byte[] buffer = new byte[2048];
+		int data = 0;
+		while((data = fis.read(buffer, 0, buffer.length)) != -1) {
+			sos.write(buffer, 0, data);
+		}
+		
+		sos.flush();
+		sos.close();
+		fis.close();
+				
+		//return "study/fileUpload/FileUploadForm";
+	}
+	
 	
 	
 }
