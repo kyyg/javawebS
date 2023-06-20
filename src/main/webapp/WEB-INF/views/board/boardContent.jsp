@@ -393,7 +393,7 @@
   <div id="reply" class="container">
     <table class="table table-hover text-left">
       <tr>
-        <th> &nbsp;작성자</th>
+        <th> &nbsp;작성자d</th>
         <th>댓글내용</th>
         <th>작성일자</th>
         <th>접속IP</th>
