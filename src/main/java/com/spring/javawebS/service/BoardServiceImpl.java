@@ -16,7 +16,9 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.spring.javawebS.dao.BoardDAO;
+import com.spring.javawebS.vo.BoardReplyVO;
 import com.spring.javawebS.vo.BoardVO;
+import com.spring.javawebS.vo.GoodVO;
 
 @Service
 public class BoardServiceImpl implements BoardService {
@@ -26,7 +28,6 @@ public class BoardServiceImpl implements BoardService {
 
 	@Override
 	public List<BoardVO> getBoardList(int startIndexNo, int pageSize) {
-		
 		return boardDAO.getBoardList(startIndexNo, pageSize);
 	}
 
@@ -37,12 +38,12 @@ public class BoardServiceImpl implements BoardService {
 
 	@Override
 	public void imgCheck(String content) {
-		//      0         1         2         3         4 
-		//      01234567890123456789012345678901234567890123456789
-		// <img src="/javawebS/data/ckeditor/2306161412.jpg
-		// <img src="/javawebS/data/baord/2306161412.jpg
+		//             0         1         2         3         4
+		//             01234567890123456789012345678901234567890
+		// <img alt="" src="/javawebS/data/ckeditor/230616141341_sanfran.jpg" style="height:300px; width:400px" /></p><p><img alt="" src="/javawebS/data/ckeditor/230616141353_paris.jpg" style="height:300px; width:400px" /></p>
+		// <img alt="" src="/javawebS/data/board/230616141341_sanfran.jpg" style="height:300px; width:400px" /></p><p><img alt="" src="/javawebS/data/ckeditor/230616141353_paris.jpg" style="height:300px; width:400px" /></p>
 		
-		// content안에 그림 파일이 존재한다면 그림을 /data/board/폴더로 복사처리한다. 없으면 돌려보낸다.
+		// content안에 그림파일이 존재한다면 그림을 /data/board/폴더로 복사처리한다. 없으면 돌려보낸다.
 		if(content.indexOf("src=\"/") == -1) return;
 		
 		HttpServletRequest request = ((ServletRequestAttributes)RequestContextHolder.currentRequestAttributes()).getRequest();
@@ -55,21 +56,21 @@ public class BoardServiceImpl implements BoardService {
 		while(sw) {
 			String imgFile = nextImg.substring(0, nextImg.indexOf("\""));
 			
-			String origFilePath = realPath + "ckeditor/" + imgFile;	
-			String copyFilePath = realPath + "board/" + imgFile;	
+			String origFilePath = realPath + "ckeditor/" + imgFile;
+			String copyFilePath = realPath + "board/" + imgFile;
 			
-			fileCopyCheck(origFilePath, copyFilePath); //ckeditor파일의 그림파일을 board폴더위치로 복사처리 하는 함수
+			fileCopyCheck(origFilePath, copyFilePath);	// ckeditor폴더의 그림파일을 board폴더위치로 복사처리한다.
 			
 			if(nextImg.indexOf("src=\"/") == -1) {
 				sw = false;
 			}
 			else {
-				nextImg = nextImg.substring(nextImg.indexOf("src=\"/") + position); // 다음 그림 위치로
+				nextImg = nextImg.substring(nextImg.indexOf("src=\"/") + position);
 			}
-		}		
+		}
 	}
 
-	// 파일을 복사처리... ckeditor파일의 그림파일을 board폴더위치로 복사처리 하는 함수
+	// 파일을 복사처리...
 	private void fileCopyCheck(String origFilePath, String copyFilePath) {
 		try {
 			FileInputStream  fis = new FileInputStream(new File(origFilePath));
@@ -77,18 +78,17 @@ public class BoardServiceImpl implements BoardService {
 			
 			byte[] bytes = new byte[2048];
 			int cnt = 0;
-			
 			while((cnt = fis.read(bytes)) != -1) {
 				fos.write(bytes, 0, cnt);
 			}
 			fos.flush();
 			fos.close();
-			fis.close();
-		} catch (FileNotFoundException e) { // 오류가 2개 날수있으므로 2개 다 올리기
-			e.printStackTrace();	
+			fis.close();		
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
-		}		
+		}
 	}
 
 	@Override
@@ -98,16 +98,164 @@ public class BoardServiceImpl implements BoardService {
 
 	@Override
 	public void setBoardReadNum(int idx) {
-		boardDAO.setBoardContent(idx);
+		boardDAO.setBoardReadNum(idx);
 	}
 
 	@Override
-	public ArrayList<BoardVO> getPreNext(int idx) {
-		return boardDAO.getPreNext(idx);
+	public ArrayList<BoardVO> getPrevNext(int idx) {
+		return boardDAO.getPrevNext(idx);
+	}
+
+	@Override
+	public void boardGoodFlagCheck(int idx, int gFlag) {
+		boardDAO.boardGoodFlagCheck(idx, gFlag);
+	}
+
+	@Override
+	public List<BoardVO> getBoardListSearch(int startIndexNo, int pageSize, String search, String searchString) {
+		return boardDAO.getBoardListSearch(startIndexNo, pageSize, search, searchString);
+	}
+
+	@Override
+	public void imgDelete(String content) {
+		//             0         1         2         3         4
+		//             01234567890123456789012345678901234567890
+		// <img alt="" src="/javawebS/data/board/230616141341_sanfran.jpg" style="height:300px; width:400px" /></p><p><img alt="" src="/javawebS/data/ckeditor/230616141353_paris.jpg" style="height:300px; width:400px" /></p>
+		
+		// content안에 그림파일이 존재한다면 그림을 /data/board/폴더로 복사처리한다. 없으면 돌려보낸다.
+		if(content.indexOf("src=\"/") == -1) return;
+		
+		HttpServletRequest request = ((ServletRequestAttributes)RequestContextHolder.currentRequestAttributes()).getRequest();
+		String realPath = request.getSession().getServletContext().getRealPath("/resources/data/");
+		
+		int position = 26;
+		String nextImg = content.substring(content.indexOf("src=\"/") + position);
+		boolean sw = true;
+		
+		while(sw) {
+			String imgFile = nextImg.substring(0, nextImg.indexOf("\""));	// 그림파일명만 꺼내오기
+			
+			String origFilePath = realPath + "board/" + imgFile;
+			
+			fileDelete(origFilePath);	// 'board'폴더의 그림을 삭제처리한다.
+			
+			if(nextImg.indexOf("src=\"/") == -1) {
+				sw = false;
+			}
+			else {
+				nextImg = nextImg.substring(nextImg.indexOf("src=\"/") + position);
+			}
+		}
+	}
+
+	// 실제로 서버의 파일을 삭제처리한다.
+	private void fileDelete(String origFilePath) {
+		File delFile = new File(origFilePath);
+		if(delFile.exists()) delFile.delete();
+	}
+
+	@Override
+	public int setBoardDelete(int idx) {
+		return boardDAO.setBoardDelete(idx);
+	}
+
+	@Override
+	public void imgCheckUpdate(String content) {
+		//             0         1         2         3         4
+		//             01234567890123456789012345678901234567890
+		// <img alt="" src="/javawebS/data/board/230616141341_sanfran.jpg" style="height:300px; width:400px" /></p><p><img alt="" src="/javawebS/data/ckeditor/230616141353_paris.jpg" style="height:300px; width:400px" /></p>
+		// <img alt="" src="/javawebS/data/ckeditor/230616141341_sanfran.jpg" style="height:300px; width:400px" /></p><p><img alt="" src="/javawebS/data/ckeditor/230616141353_paris.jpg" style="height:300px; width:400px" /></p>
+		
+		// content안에 그림파일이 존재한다면 그림을 /data/board/폴더로 복사처리한다. 없으면 돌려보낸다.
+		if(content.indexOf("src=\"/") == -1) return;
+		
+		HttpServletRequest request = ((ServletRequestAttributes)RequestContextHolder.currentRequestAttributes()).getRequest();
+		String realPath = request.getSession().getServletContext().getRealPath("/resources/data/");
+		
+		int position = 26;
+		String nextImg = content.substring(content.indexOf("src=\"/") + position);
+		boolean sw = true;
+		
+		while(sw) {
+			String imgFile = nextImg.substring(0, nextImg.indexOf("\""));
+			
+			String origFilePath = realPath + "board/" + imgFile;
+			String copyFilePath = realPath + "ckeditor/" + imgFile;
+			
+			fileCopyCheck(origFilePath, copyFilePath);	// ckeditor폴더의 그림파일을 board폴더위치로 복사처리한다.
+			
+			if(nextImg.indexOf("src=\"/") == -1) {
+				sw = false;
+			}
+			else {
+				nextImg = nextImg.substring(nextImg.indexOf("src=\"/") + position);
+			}
+		}
+	}
+
+	@Override
+	public int setBoardUpdate(BoardVO vo) {
+		return boardDAO.setBoardUpdate(vo);
+	}
+
+	@Override
+	public void setBoardGoodPlus(int idx) {
+		boardDAO.setBoardGoodPlus(idx);
+	}
+
+	@Override
+	public void setGoodPlusMinus(int idx, int goodCnt) {
+		boardDAO.setGoodPlusMinus(idx, goodCnt);
+	}
+
+	@Override
+	public void setGoodDBInput(GoodVO goodVo) {
+		boardDAO.setGoodDBInput(goodVo);
+	}
+
+	@Override
+	public void setGoodUpdate(int idx, int item) {
+		boardDAO.setGoodUpdate(idx, item);
+	}
+
+	@Override
+	public void setGoodDBDelete(int idx) {
+		boardDAO.setGoodDBDelete(idx);
+	}
+
+	@Override
+	public GoodVO getBoardGoodCheck(int partIdx, String part, String mid) {
+		return boardDAO.getBoardGoodCheck(partIdx, part, mid);
+	}
+
+	@Override
+	public String getMaxGroupId(int boardIdx) {
+		return boardDAO.getMaxGroupId(boardIdx);
+	}
+
+	@Override
+	public void setBoardReplyInput(BoardReplyVO replyVO) {
+		boardDAO.setBoardReplyInput(replyVO);
+	}
+
+	@Override
+	public List<BoardReplyVO> setBoardReply(int idx) {
+		return boardDAO.setBoardReply(idx);
+	}
+
+	@Override
+	public void setBoardReplyDelete(int replyIdx, int level, int groupId, int boardIdx) {
+		boardDAO.setBoardReplyDelete(replyIdx,level, groupId, boardIdx);
+	}
+
+	@Override
+	public BoardReplyVO getBoardReplyIdx(int replyIdx) {
+		return boardDAO.getBoardReplyIdx(replyIdx);
+	}
+
+	@Override
+	public void setBoardReplyUpdate(int idx, String content, String hostIp) {
+		boardDAO.setBoardReplyUpdate(idx,content,hostIp);
 	}
 	
-	
-	
-	
 }
-

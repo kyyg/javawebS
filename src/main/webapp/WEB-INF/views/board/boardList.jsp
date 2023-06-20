@@ -40,7 +40,7 @@
   <h2 class="text-center">게 시 판 리 스 트</h2>
   <table class="table table-borderless">
     <tr>
-      <td><c:if test="${sLevel != 1}"><a href="${ctp}/board/boardInput" class="btn btn-primary btn-sm">글쓰기</a></c:if></td>
+      <td><c:if test="${sLevel < 3}"><a href="${ctp}/board/boardInput" class="btn btn-primary btn-sm">글쓰기</a></c:if></td>
       <td class="text-right">
         <!-- 한페이지 분량처리 -->
         <select name="pageSize" id="pageSize" onchange="pageCheck()">
@@ -109,7 +109,7 @@
   
   <!-- 검색기 처리 -->
   <div class="container text-center">
-    <form name="searchForm" method="post" action="${ctp}/board/boardSearch">
+    <form name="searchForm" method="get" action="${ctp}/board/boardSearch">
       <b>검색 : </b>
       <select name="search">
         <option value="title" selected>글제목</option>

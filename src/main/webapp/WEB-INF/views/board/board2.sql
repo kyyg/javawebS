@@ -31,6 +31,8 @@ create table board2Reply (
   wDate		datetime default now(),				/* 댓글 올린 날짜 */
   hostIp  varchar(50)  not null,				/* 댓글 올린 PC의 고유 IP */
   content text not null,								/* 댓글 내용 */
+  groupId int default 0,                /* 그룹 ID(같은 댓글끼리의 그룹아이디는 같다) */
+  level		int default 0,								/* 대댓글의 구분을 위한 level(원본글의 댓글은 0, 대댓글은 1,2,3...) */
   primary key(idx),											/* 기본키 : 고유번호 */
   foreign key(boardIdx) references board2(idx)		/* 외래키 설정 */
   on update cascade
