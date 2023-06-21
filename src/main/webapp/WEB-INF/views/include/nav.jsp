@@ -11,7 +11,7 @@
     <a href="${ctp}/guest/guestList" class="w3-bar-item w3-button w3-padding-large w3-hide-small">Guest</a>
     <c:if test="${sLevel <= 3}">
 	    <a href="${ctp}/board/boardList" class="w3-bar-item w3-button w3-padding-large w3-hide-small">Board</a>
-	    <a href="#" class="w3-bar-item w3-button w3-padding-large w3-hide-small">Pds</a>
+	    <a href="${ctp}/pds/pdsList" class="w3-bar-item w3-button w3-padding-large w3-hide-small">Pds</a>
 	    <div class="w3-dropdown-hover w3-hide-small">
 	      <button class="w3-padding-large w3-button" title="More">Study1 <i class="fa fa-caret-down"></i></button>     
 	      <div class="w3-dropdown-content w3-bar-block w3-card-4">
@@ -26,7 +26,13 @@
 	      </div>
 	    </div>
 	    <div class="w3-dropdown-hover w3-hide-small">
-	      <button class="w3-padding-large w3-button" title="More">MyPage <i class="fa fa-caret-down"></i></button>     
+	      <button class="w3-padding-large w3-button" title="More">Study2 <i class="fa fa-caret-down"></i></button>     
+	      <div class="w3-dropdown-content w3-bar-block w3-card-4">
+	        <a href="${ctp}/study/validator/validatorList" class="w3-bar-item w3-button">validator연습</a>
+	      </div>
+	    </div>
+	    <div class="w3-dropdown-hover w3-hide-small">
+	      <button class="w3-padding-large w3-button" onclick="location.href='${ctp}/member/memberMain';" title="More">MyPage <i class="fa fa-caret-down"></i></button>     
 	      <div class="w3-dropdown-content w3-bar-block w3-card-4">
 	        <a href="${ctp}/member/memberList" class="w3-bar-item w3-button">회원리스트</a>
 	        <a href="${ctp}/member/memberPwdUpdate?pwdFlag=member" class="w3-bar-item w3-button">비밀번호변경</a>

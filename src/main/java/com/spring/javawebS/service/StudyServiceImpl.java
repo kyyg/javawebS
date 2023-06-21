@@ -3,7 +3,6 @@ package com.spring.javawebS.service;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
@@ -16,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.spring.javawebS.dao.StudyDAO;
 import com.spring.javawebS.vo.MemberVO;
+import com.spring.javawebS.vo.UserVO;
 
 @Service
 public class StudyServiceImpl implements StudyService {
@@ -24,14 +24,9 @@ public class StudyServiceImpl implements StudyService {
 	StudyDAO studyDAO;
 
 	@Override
-	public List<MemberVO> getEmailList() {
-		return studyDAO.getEmailList();
-	}
-
-	@Override
 	public String[] getCityStringArray(String dodo) {
 		String[] strArray = new String[100];
-
+		
 		if(dodo.equals("서울")) {
 			strArray[0] = "강남구";
 			strArray[1] = "서초구";
@@ -69,8 +64,8 @@ public class StudyServiceImpl implements StudyService {
 			strArray[3] = "예산군";
 			strArray[4] = "공주시";
 			strArray[5] = "청양군";
-			strArray[6] = "보령시";
-			strArray[7] = "부여군";
+			strArray[6] = "부여군";
+			strArray[7] = "논산시";
 		}
 		else if(dodo.equals("경북")) {
 			strArray[0] = "봉화군";
@@ -88,27 +83,27 @@ public class StudyServiceImpl implements StudyService {
 
 	@Override
 	public ArrayList<String> getCityArrayList(String dodo) {
-		 ArrayList<String> vos = new  ArrayList<String>();
-		 
-	 if (dodo.equals("서울")) {
-    vos.add("강남구");
-    vos.add("서초구");
-    vos.add("마포구");
-    vos.add("영등포구");
-    vos.add("관악구");
-    vos.add("중구");
-    vos.add("동대문구");
-    vos.add("성북구");
+		ArrayList<String> vos = new ArrayList<String>();
+		
+		if(dodo.equals("서울")) {
+			vos.add("강남구");
+			vos.add("서초구");
+			vos.add("마포구");
+			vos.add("영등포구");
+			vos.add("관악구");
+			vos.add("중구");
+			vos.add("동대문구");
+			vos.add("성북구");
 		}
-		else if (dodo.equals("경기")) {
-	    vos.add("수원시");
-	    vos.add("안양시");
-	    vos.add("안성시");
-	    vos.add("고양시");
-	    vos.add("일산시");
-	    vos.add("용인시");
-	    vos.add("의정부시");
-	    vos.add("광명시");
+		else if(dodo.equals("경기")) {
+			vos.add("수원시");
+			vos.add("안양시");
+			vos.add("안성시");
+			vos.add("고양시");
+			vos.add("일산시");
+			vos.add("용인시");
+			vos.add("의정부시");
+			vos.add("광명시");
 		}
 		else if (dodo.equals("충북")) {
 	    vos.add("청주시");
@@ -119,7 +114,7 @@ public class StudyServiceImpl implements StudyService {
 	    vos.add("음성군");
 	    vos.add("괴산군");
 	    vos.add("증평군");
-		}
+		} 
 		else if (dodo.equals("충남")) {
 	    vos.add("천안시");
 	    vos.add("아산시");
@@ -129,7 +124,7 @@ public class StudyServiceImpl implements StudyService {
 	    vos.add("청양군");
 	    vos.add("부여군");
 	    vos.add("논산시");
-		}
+		} 
 		else if (dodo.equals("경북")) {
 	    vos.add("봉화군");
 	    vos.add("구미시");
@@ -150,7 +145,6 @@ public class StudyServiceImpl implements StudyService {
 
 	@Override
 	public ArrayList<MemberVO> getMemberMidSearch2(String name) {
-		
 		return studyDAO.getMemberMidSearch2(name);
 	}
 
@@ -160,8 +154,8 @@ public class StudyServiceImpl implements StudyService {
 		
 		UUID uid = UUID.randomUUID();
 		String oFileName = fName.getOriginalFilename();
-		String saveFileName = mid + uid + "_" + oFileName;
-		//System.out.println("oFileName: " + oFileName);
+		String saveFileName = mid + "_" + uid + "_" + oFileName;
+		// System.out.println("oFileName : " + oFileName);
 		
 		// 메모리에 올라와 있는 파일의 정보를 실제 서버 파일시스템에 저장처리한다.
 		try {
@@ -184,7 +178,21 @@ public class StudyServiceImpl implements StudyService {
 		FileOutputStream fos = new FileOutputStream(realPath + saveFileName);
 		fos.write(data);
 		fos.close();
-		
+	}
+
+	@Override
+	public int setUserInput(UserVO vo) {
+		return studyDAO.setUserInput(vo);
+	}
+
+	@Override
+	public ArrayList<UserVO> getUserList() {
+		return studyDAO.getUserList();
+	}
+
+	@Override
+	public void setUserDelete(int idx) {
+		studyDAO.setUserDelete(idx);
 	}
 	
 }
