@@ -7,4 +7,4 @@ create table good (
 
 desc good;
 
-drop table good;
+drop table good;;

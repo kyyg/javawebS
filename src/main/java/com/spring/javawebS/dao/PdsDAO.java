@@ -12,6 +12,12 @@ public interface PdsDAO {
 
 	public List<PdsVO> getPdsList(@Param("startIndexNo") int startIndexNo, @Param("pageSize") int pageSize, @Param("part") String part);
 
-	public int setPdsInput(@Param("vo")PdsVO vo);
+	public int setPdsInput(@Param("vo") PdsVO vo);
+
+	public int setPdsDownNumCheck(@Param("idx") int idx);
+
+	public PdsVO getPdsIdxSearch(@Param("idx") int idx);
+
+	public void setPdsDelete(@Param("idx") int idx);
 
 }

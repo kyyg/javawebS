@@ -20,7 +20,7 @@
     }
     
     // 다운로드횟수 증가처리(AJAX)
-    function downNumCheck(idx, fSName) {
+    function downNumCheck(idx) {
     	$.ajax({
     		type : "post",
     		url  : "${ctp}/pds/pdsDownNumCheck",
@@ -29,7 +29,7 @@
     			location.reload();
     		},
     		error : function() {
-    			alert("전송오류!!");
+    			alert("전송오류!!!");
     		}
     	});
     }
@@ -97,11 +97,9 @@
     // modal창을 통해서 비밀번호 확인후 파일을 삭제처리(Ajax처리)
     function pdsDelCheckModalOk() {
     	let idx = pwdModalForm.idx.value;
-    	let fSName = pwdModalForm.fSName.value;
     	let pwd = pwdModalForm.pwd.value;
     	let query = {
     			idx : idx,
-    			fSName : fSName,
     			pwd : pwd
     	}
     	
@@ -127,10 +125,8 @@
     
     // modal창을 통해서 비밀번호 확인후 파일을 삭제처리
     function pdsDelCheckModal(idx,fSName) {
-    	$("#myPwdModal").on("show.bs.modal", function(e){
-    		$(".modal-body #idx").val(idx);
-    		$(".modal-body #fSName").val(fSName);
-    	});
+  		$("#myPwdModal .modal-body #idx").val(idx);
+  		$("#myPwdModal .modal-body #fSName").val(fSName);
     }
   </script>
 </head>
@@ -170,7 +166,7 @@
       <th>다운수</th>
       <th>비고</th>
     </tr>
-    <c:set var="curScrStartNo" value="${curScrStartNo}"/>
+    <c:set var="curScrStartNo" value="${pageVO.curScrStartNo}"/>
     <c:forEach var="vo" items="${vos}" varStatus="st">
       <tr>
         <td>${curScrStartNo}</td>
@@ -190,8 +186,8 @@
         <td>
           <c:set var="fNames" value="${fn:split(vo.FName,'/')}"/>
           <c:set var="fSNames" value="${fn:split(vo.FSName,'/')}"/>
-          <c:forEach var="fName" items="${FNames}" varStatus="st">
-            <a href="${ctp}/pds/${FSNames[st.index]}" download="${fName}" onclick="downNumCheck(${vo.idx})">${fName}</a><br/>
+          <c:forEach var="fName" items="${fNames}" varStatus="st">
+            <a href="${ctp}/pds/${fSNames[st.index]}" download="${fName}" onclick="downNumCheck(${vo.idx})">${fName}</a><br/>
           </c:forEach>
           (<fmt:formatNumber value="${vo.FSize/1024}" pattern="#,##0" />KByte)
         </td>
@@ -199,10 +195,11 @@
         <td>
           <a href="#" onclick="modalView('${vo.title}','${vo.nickName}','${vo.mid}','${vo.part}','${vo.FName}','${vo.FSName}','${vo.FSize}','${vo.downNum}','${vo.FDate}')" class="badge badge-info" data-toggle="modal" data-target="#myModal">모달창</a><br/>
           <a href="${ctp}/pds/pdsTotalDown?idx=${vo.idx}" class="badge badge-primary">전체다운</a><br/>
-          <a href="javascript:pdsDeleteCheck('${vo.idx}','${vo.FSName}')" class="badge badge-danger">삭제1</a>
-          <a href="#" onclick="pdsDelCheckModal('${vo.idx}','${vo.FSName}')" data-toggle="modal" data-target="#myPwdModal" class="badge badge-danger">삭제2</a>
+          <%-- <a href="javascript:pdsDeleteCheck('${vo.idx}','${vo.FSName}')" class="badge badge-danger">삭제1</a> --%>
+          <a href="#" onclick="pdsDelCheckModal('${vo.idx}','${vo.FSName}')" data-toggle="modal" data-target="#myPwdModal" class="badge badge-danger">삭제</a>
         </td>
       </tr>
+      <c:set var="curScrStartNo" value="${curScrStartNo - 1}"/>
     </c:forEach>
     <tr><td colspan="8" class="m-0 p-0"></td></tr>
   </table>
@@ -287,7 +284,6 @@
           <input type="password" name="pwd" id="pwd" placeholder="비밀번호를 입력하세요." class="form-control mb-2" required />
           <input type="button" value="비밀번호확인후전송" onclick="pdsDelCheckModalOk()" class="btn btn-success form-control"/>
           <input type="hidden" name="idx" id="idx"/>
-          <input type="hidden" name="fSName" id="fSName"/>
         </form>
       </div>
       

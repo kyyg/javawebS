@@ -6,12 +6,29 @@
   </select>
   
   <select id="getPdsList" resultType="com.spring.javawebS.vo.PdsVO">
-    select * from pds2 <if test='part != "전체"'> where part = #{part} </if> order by idx desc limit #{startIndexNo},#{pageSize};
+    SELECT 	*,datediff(now(), fDate) as day_diff, timestampdiff(hour, fDate, now()) as hour_diff FROM pds2 <if test='part != "전체"'> where part = #{part} </if> order by idx desc limit #{startIndexNo},#{pageSize};
+  </select>
+  
+  <select id="getPdsIdxSearch" resultType="com.spring.javawebS.vo.PdsVO">
+    select * from pds2 where idx = #{idx};
   </select>
   
   
+  
   <insert id="setPdsInput">
-  	insert into pds2 values (default, #{vo.mid},#{vo.nickName},#{vo.fName},#{vo.fSName},#{vo.fSize},#{vo.title},#{vo.part},#{vo.pwd},default,default,#{vo.openSw},#{vo.content},#{vo.hostIp});
+    insert into pds2 values (default,#{vo.mid},#{vo.nickName},#{vo.fName},#{vo.fSName},#{vo.fSize},#{vo.title},#{vo.part},#{vo.pwd},default,default,#{vo.openSw},#{vo.content},#{vo.hostIp});
   </insert>
+  
+  
+  
+  <update id="setPdsDownNumCheck">
+    update pds2 set downNum = downNum + 1 where idx = #{idx};
+  </update>
+  
+  
+  
+  <delete id="setPdsDelete">
+    delete from pds2 where idx = #{idx};
+  </delete>
   
 </mapper>

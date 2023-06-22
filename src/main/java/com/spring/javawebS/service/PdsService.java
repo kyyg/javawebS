@@ -12,4 +12,10 @@ public interface PdsService {
 
 	public int setPdsInput(PdsVO vo, MultipartHttpServletRequest file);
 
+	public int setPdsDownNumCheck(int idx);
+
+	public PdsVO getPdsIdxSearch(int idx);
+
+	public void setPdsDelete(PdsVO vo);
+
 }

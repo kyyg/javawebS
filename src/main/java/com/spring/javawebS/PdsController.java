@@ -9,7 +9,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import com.spring.javawebS.pagination.PageProcess;
@@ -46,7 +46,7 @@ public class PdsController {
 	}
 	
 	@RequestMapping(value = "/pdsInput", method = RequestMethod.GET)
-	public String pdsInputGet(String part,Model model) {
+	public String pdsInputGet(String part, Model model) {
 		model.addAttribute("part", part);
 		return "pds/pdsInput";
 	}
@@ -55,12 +55,42 @@ public class PdsController {
 	public String pdsInputPost(PdsVO vo, MultipartHttpServletRequest file) {
 		String pwd = passwordEncoder.encode(vo.getPwd());
 		vo.setPwd(pwd);
-		
+		System.out.println("vo : " + vo);
 		int res = pdsService.setPdsInput(vo, file);
+		System.out.println("res : " + res);
 		
 		if(res == 1) return "redirect:/message/pdsInputOk";
 		else return "redirect:/message/pdsInputNo";
 	}
 	
+	// 개별파일 다운로드 하기
+	@ResponseBody
+	@RequestMapping(value = "/pdsDownNumCheck", method = RequestMethod.POST)
+	public String pdsDownNumCheckPost(int idx) {
+		int res = pdsService.setPdsDownNumCheck(idx);
+		return res + "";
+	}
 	
+	// 자료실 삭제 : 파일도 함께 삭제하기
+	@ResponseBody
+	@RequestMapping(value = "/pdsDeleteCheck", method = RequestMethod.POST)
+	public String pdsDeleteCheckPost(int idx, String pwd) {
+		PdsVO vo = pdsService.getPdsIdxSearch(idx);
+		if(!passwordEncoder.matches(pwd, vo.getPwd())) return "0";
+		
+		// 비밀번호가 일치하면 파일 삭제후 DB에서 내역을 삭제처리한다.
+		pdsService.setPdsDelete(vo);
+		return "1";
+	}
+	
+	@RequestMapping(value = "/pdsContent", method = RequestMethod.GET)
+	public String pdsContentGet(Model model,
+			@RequestParam(name="idx", defaultValue = "0", required=false) int idx,
+			@RequestParam(name="pag", defaultValue = "1", required=false) int pag,
+			@RequestParam(name="part", defaultValue = "전체", required=false) String part) {
+		PdsVO vo = pdsService.getPdsIdxSearch(idx);
+		model.addAttribute("vo", vo);
+		
+		return "pds/pdsContent";
+	}
 }
