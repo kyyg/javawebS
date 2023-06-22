@@ -18,6 +18,8 @@
     select * from user order by idx desc;
   </select>
   
+
+  
   
   
   <delete id="setUserDelete">

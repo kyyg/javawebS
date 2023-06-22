@@ -3,6 +3,7 @@ package com.spring.javawebS.service;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
@@ -14,6 +15,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.spring.javawebS.dao.StudyDAO;
+import com.spring.javawebS.vo.KakaoAddressVO;
 import com.spring.javawebS.vo.MemberVO;
 import com.spring.javawebS.vo.UserVO;
 
@@ -193,6 +195,27 @@ public class StudyServiceImpl implements StudyService {
 	@Override
 	public void setUserDelete(int idx) {
 		studyDAO.setUserDelete(idx);
+	}
+
+	
+	@Override
+	public KakaoAddressVO getKakaoAddressName(String address) {
+		return studyDAO.getKakaoAddressName(address);
+	}
+
+	@Override
+	public void setKakaoAddressInput(KakaoAddressVO vo) {
+		studyDAO.setKakaoAddressInput(vo);
+	}
+
+	@Override
+	public List<KakaoAddressVO> getKakaoAddressList() {
+		return studyDAO.getKakaoAddressList();
+	}
+
+	@Override
+	public void setKakaoAddressDelete(String address) {
+		studyDAO.setKakaoAddressDelete(address);
 	}
 	
 }
