@@ -1,5 +1,13 @@
 package com.spring.javawebS;
 
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics2D;
+import java.awt.GraphicsEnvironment;
+import java.awt.RenderingHints;
+import java.awt.font.FontRenderContext;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -10,12 +18,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
+import javax.imageio.ImageIO;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -39,6 +50,7 @@ import com.spring.javawebS.service.StudyService;
 import com.spring.javawebS.vo.KakaoAddressVO;
 import com.spring.javawebS.vo.MailVO;
 import com.spring.javawebS.vo.MemberVO;
+import com.spring.javawebS.vo.QrCodeVO;
 import com.spring.javawebS.vo.UserVO;
 
 @Controller
@@ -469,13 +481,13 @@ public class StudyController {
 		return "study/kakaomap/kakaomap";
 	}
 	
-	// kakaomap 클릭한 위치에 마커 표시하기
+	// kakaomap 클릭한 위치에 마커표시하기
 	@RequestMapping(value = "/kakaomap/kakaoEx1", method = RequestMethod.GET)
 	public String kakaoEx1Get() {
 		return "study/kakaomap/kakaoEx1";
 	}
 	
-	// kakaomap 마커 표시 DB저장
+	// kakaomap 클릭한 위치에 마커표시하기(DB저장)
 	@ResponseBody
 	@RequestMapping(value = "/kakaomap/kakaoEx1", method = RequestMethod.POST)
 	public String kakaoEx1Post(KakaoAddressVO vo) {
@@ -485,22 +497,21 @@ public class StudyController {
 		return "1";
 	}
 	
-	// DB에 저장된 지명 검색하기
+	// kakaomap DB에 저장된 지명 검색하기
 	@RequestMapping(value = "/kakaomap/kakaoEx2", method = RequestMethod.GET)
-	public String kakaoEx2Get(Model model, 
+	public String kakaoEx2Get(Model model,
 			@RequestParam(name="address", defaultValue = "그린컴퓨터", required=false) String address) {
 		KakaoAddressVO vo = studyService.getKakaoAddressName(address);
 		List<KakaoAddressVO> vos = studyService.getKakaoAddressList();
 		
-		model.addAttribute("vos", vos);
 		model.addAttribute("vo", vo);
-		model.addAttribute("address",address);
+		model.addAttribute("vos", vos);
+		model.addAttribute("address", address);
 		
 		return "study/kakaomap/kakaoEx2";
 	}
 	
-	
-	// kakaomap 마커 주소 삭제
+	// kakaomap DB에 저장된 주소 삭제처리
 	@ResponseBody
 	@RequestMapping(value = "/kakaomap/kakaoAddressDelete", method = RequestMethod.POST)
 	public String kakaoAddressDeletePost(String address) {
@@ -508,23 +519,170 @@ public class StudyController {
 		return "";
 	}
 	
-	// kakao DB에 저장된 키워드로 검색 후 내 DB에 저장하기
+	// kakaomap Kakao데이터베이스에 들어있는 지명으로 검색하후 내DB에 저장하기
 	@RequestMapping(value = "/kakaomap/kakaoEx3", method = RequestMethod.GET)
-	public String kakaoEx3Get(Model model, 
+	public String kakaoEx3Get(Model model,
 			@RequestParam(name="address", defaultValue = "청주시청", required=false) String address) {
-			model.addAttribute("address", address);
+		model.addAttribute("address", address);
 		return "study/kakaomap/kakaoEx3";
 	}
 	
-	// kakao 주변 검색처리
+	// kakaomap 주변검색처리
 	@RequestMapping(value = "/kakaomap/kakaoEx4", method = RequestMethod.GET)
-	public String kakaoEx4Get(Model model, 
+	public String kakaoEx4Get(Model model,
 			@RequestParam(name="address", defaultValue = "청주시청", required=false) String address) {
 		model.addAttribute("address", address);
 		return "study/kakaomap/kakaoEx4";
 	}
 	
+	// QR코드 폼
+	@RequestMapping(value = "/qrCode/qrCodeForm", method = RequestMethod.GET)
+	public String qrcodeFormGet() {
+		return "study/qrCode/qrCodeForm";
+	}
 	
+	// QR코드 폼(개인정보등록)
+	@RequestMapping(value = "/qrCode/qrCodeEx1", method = RequestMethod.GET)
+	public String qrcodeEx1Get() {
+		return "study/qrCode/qrCodeEx1";
+	}
 	
+	// QR코드 폼(개인정보등록)
+	@ResponseBody
+	@RequestMapping(value = "/qrCode/qrCodeEx1", method = RequestMethod.POST, produces="application/text; charset=utf8")
+	public String qrcodeEx1Post(QrCodeVO vo, HttpServletRequest request) {
+		String realPath = request.getSession().getServletContext().getRealPath("/resources/data/qrCode/");
+		String qrCodeName = studyService.qrCreate(vo, realPath);
+		return qrCodeName;
+	}
 	
+	// QR코드 폼(정보 사이트 등록)
+	@RequestMapping(value = "/qrCode/qrCodeEx2", method = RequestMethod.GET)
+	public String qrcodeEx2Get() {
+		return "study/qrCode/qrCodeEx2";
+	}
+	
+	// QR코드 폼(정보 사이트 등록)
+	@ResponseBody
+	@RequestMapping(value = "/qrCode/qrCodeEx2", method = RequestMethod.POST, produces="application/text; charset=utf8")
+	public String qrcodeEx2Post(QrCodeVO vo, HttpServletRequest request) {
+		String realPath = request.getSession().getServletContext().getRealPath("/resources/data/qrCode/");
+		String qrCodeName = studyService.qrCreate2(vo, realPath);
+		return qrCodeName;
+	}
+	
+	// QR코드 폼(영화예매하기)
+	@RequestMapping(value = "/qrCode/qrCodeEx3", method = RequestMethod.GET)
+	public String qrcodeEx3Get() {
+		return "study/qrCode/qrCodeEx3";
+	}
+	
+	// QR코드 폼(영화예매하기)
+	@ResponseBody
+	@RequestMapping(value = "/qrCode/qrCodeEx3", method = RequestMethod.POST, produces="application/text; charset=utf8")
+	public String qrcodeEx3Post(QrCodeVO vo, HttpServletRequest request) {
+		String realPath = request.getSession().getServletContext().getRealPath("/resources/data/qrCode/");
+		String qrCodeName = studyService.qrCreate3(vo, realPath);
+		return qrCodeName;
+	}
+	
+	// QR코드 폼(영화예매하기) - DB저장/확인
+	@RequestMapping(value = "/qrCode/qrCodeEx4", method = RequestMethod.GET)
+	public String qrcodeEx4Get() {
+		return "study/qrCode/qrCodeEx4";
+	}
+	
+	// QR코드 폼(영화예매하기) - DB저장/확인
+	@ResponseBody
+	@RequestMapping(value = "/qrCode/qrCodeEx4", method = RequestMethod.POST, produces="application/text; charset=utf8")
+	public String qrcodeEx4Post(QrCodeVO vo, HttpServletRequest request) {
+		String realPath = request.getSession().getServletContext().getRealPath("/resources/data/qrCode/");
+		String qrCodeName = studyService.qrCreate4(vo, realPath);
+		return qrCodeName;
+	}
+	
+	// QR코드 폼(영화예매하기) - DB검색
+	/*
+	@ResponseBody
+	@RequestMapping(value = "/qrCode/qrCodeSearch", method = RequestMethod.POST, produces="application/text; charset=utf8")
+	public String qrCodeSearchPost(String qrCode) {
+		QrCodeVO vo = studyService.getQrCodeSearch(qrCode);
+		
+		String str = "";
+		str += "아이디 : " + vo.getMid()+ ",";
+		str += "성명 : " + vo.getName()+ ",";
+		str += "이메일 : " + vo.getEmail()+ ",";
+		str += "영화제목 : " + vo.getMovieName()+ ",";
+		str += "상영일자 : " + vo.getMovieDate()+ ",";
+		str += "상영시간 : " + vo.getMovieTime()+ ",";
+		str += "성인수 : " + vo.getMovieAdult()+ ",";
+		str += "어린이수 : " + vo.getMovieChild()+ ",";
+		str += "티켓구매일자 : " + vo.getPublishNow();
+		
+		return str;
+	}
+	*/
+	@ResponseBody
+	@RequestMapping(value = "/qrCode/qrCodeSearch", method = RequestMethod.POST)
+	public QrCodeVO qrCodeSearchPost(String qrCode) {
+		return studyService.getQrCodeSearch(qrCode);
+	}
+	
+	// 캡차 연습폼...
+	@RequestMapping(value = "/captcha/captchaForm", method = RequestMethod.GET)
+	public String captchaFormGet() {
+		return "study/captcha/captchaForm";
+	}
+	
+	// 캡차 이미지 생성하기(랜덤...)
+	@ResponseBody
+	@RequestMapping(value = "/captcha/captchaImage", method = RequestMethod.POST)
+	public String captchaImagePost(HttpServletRequest request, HttpServletResponse response) {
+		try {
+			// 알파벳과 숫자가 섞인 5글자 문자열을 랜덤하게 생성...
+			String randomString = RandomStringUtils.randomAlphanumeric(5);
+			System.out.println("randomString : " + randomString);
+			
+			// 랜덤하게 생성된 문자를 세션에 저장한다.
+		  request.getSession().setAttribute("CAPTCHA", randomString);
+		  
+		  // 시스템에 등록된 폰트들의 목록(이름)을 확인
+//		  Font[] fontList = GraphicsEnvironment.getLocalGraphicsEnvironment().getAllFonts();
+//		  for(Font f : fontList) {
+//		  	System.out.println(f.getName());
+//		  }
+		  Font font = new Font("Jokerman", Font.ITALIC, 30);
+		  FontRenderContext frc = new FontRenderContext(null, true, true);
+		  Rectangle2D bounds = font.getStringBounds(randomString, frc);
+		  int w = (int) bounds.getWidth();
+		  int h = (int) bounds.getHeight();
+		  
+		  // 이미지로 생성
+		  BufferedImage image = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
+		  Graphics2D g = image.createGraphics();
+		  // g.setColor(Color.WHITE);
+		  g.fillRect(0, 0, w, h);
+		  g.setColor(new Color(0, 156, 240));
+		  g.setFont(font);
+		  g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+		  g.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
+		  g.drawString(randomString, (float)bounds.getX(), (float)-bounds.getY());
+		  g.dispose();
+		  
+		  String realPath = request.getSession().getServletContext().getRealPath("/resources/images/");
+		  ImageIO.write(image, "png", new File(realPath + "captcha.png"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return "study/captcha/captchaForm";
+	}
+	
+	// 캡차 비교
+	@ResponseBody
+	@RequestMapping(value = "/captcha/captchaForm", method = RequestMethod.POST)
+	public String captchaPost(HttpSession session, String strCaptcha) {
+		if(strCaptcha.equals(session.getAttribute("CAPTCHA").toString())) return "1";
+		else return "0";
+	}
 }
