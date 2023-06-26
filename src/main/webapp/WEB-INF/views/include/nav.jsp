@@ -41,7 +41,7 @@
 	        <a href="${ctp}/member/memberPwdUpdate?pwdFlag=member" class="w3-bar-item w3-button">비밀번호변경</a>
 	        <a href="${ctp}/member/memberPwdCheck" class="w3-bar-item w3-button">정보수정</a>
 	        <a href="javascript:memberDelete()" class="w3-bar-item w3-button">회원탈퇴</a>
-	        <c:if test="${sLevel==0}"><a href="${ctp}/admin/adminMenu" class="w3-bar-item w3-button">관리자</a></c:if>
+	        <c:if test="${sLevel==0}"><a href="${ctp}/admin/adminMain" class="w3-bar-item w3-button">관리자</a></c:if>
 	      </div>
 	    </div>
     </c:if>
