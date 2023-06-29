@@ -10,19 +10,6 @@
     select * from member where name like concat('%',#{name},'%') order by name;
   </select>
   
-  <select id="getUserList" resultType="com.spring.javawebS.vo.UserVO">
-    select * from user order by idx desc;
-  </select>
-  
-  <select id="getQrCodeSearch" resultType="com.spring.javawebS.vo.QrCodeVO">
-    select * from qrCode where qrCodeName = #{qrCode};
-  </select>
-  
-  
-  
-  
-  
-  
   <insert id="setUserInput">
     insert into user values (default,#{vo.mid},#{vo.name},#{vo.age},#{vo.address});
   </insert>
@@ -30,7 +17,14 @@
   <insert id="setQrCreateDB">
     insert into qrCode values (default,#{vo.mid},#{vo.name},#{vo.email},#{vo.movieName},#{vo.movieDate},#{vo.movieTime},#{vo.movieAdult},#{vo.movieChild},#{vo.publishNow},#{vo.qrCodeName});
   </insert>
-
+  
+  <select id="getUserList" resultType="com.spring.javawebS.vo.UserVO">
+    select * from user order by idx desc;
+  </select>
+  
+  <select id="getQrCodeSearch" resultType="com.spring.javawebS.vo.QrCodeVO">
+    select * from qrCode where qrCodeName = #{qrCode};
+  </select>
   
   
   

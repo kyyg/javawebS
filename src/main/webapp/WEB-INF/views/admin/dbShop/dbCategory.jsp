@@ -124,6 +124,78 @@
   			}
     	});
     }
+    
+    // 대분류 삭제하기
+    function categoryMainDelete(categoryMainCode) {
+    	let ans = confirm("대분류항목을 삭제하시겠습니까?");
+    	if(!ans) return false;
+    	
+    	$.ajax({
+    		type : "post",
+    		url  : "${ctp}/dbShop/categoryMainDelete",
+    		data : {categoryMainCode : categoryMainCode},
+    		success:function(res) {
+    			if(res == "0") {
+    				alert("하위항목이 있기에 삭제할수 없습니다.\n하위항목을 먼저 삭제해 주세요.");
+    			}
+    			else {
+    				alert("대분류 항목이 삭제 되었습니다.");
+    				location.reload();
+    			}
+    		},
+    		error : function() {
+    			alert("전송오류!");
+    		}
+    	});
+    }
+    
+    // 중분류 삭제하기
+    function categoryMiddleDelete(categoryMiddleCode) {
+    	let ans = confirm("중분류항목을 삭제하시겠습니까?");
+    	if(!ans) return false;
+    	
+    	$.ajax({
+    		type : "post",
+    		url  : "${ctp}/dbShop/categoryMiddleDelete",
+    		data : {categoryMiddleCode : categoryMiddleCode},
+    		success:function(res) {
+    			if(res == "0") {
+    				alert("하위항목이 있기에 삭제할수 없습니다.\n하위항목을 먼저 삭제해 주세요.");
+    			}
+    			else {
+    				alert("중분류 항목이 삭제 되었습니다.");
+    				location.reload();
+    			}
+    		},
+    		error : function() {
+    			alert("전송오류!");
+    		}
+    	});
+    }
+    
+    // 소분류 삭제하기
+    function categorySubDelete(categorySubCode) {
+    	let ans = confirm("소분류항목을 삭제하시겠습니까?");
+    	if(!ans) return false;
+    	
+    	$.ajax({
+    		type : "post",
+    		url  : "${ctp}/dbShop/categorySubDelete",
+    		data : {categorySubCode : categorySubCode},
+    		success:function(res) {
+    			if(res == "0") {
+    				alert("하위항목이 있기에 삭제할수 없습니다.\n하위항목을 먼저 삭제해 주세요.");
+    			}
+    			else {
+    				alert("소분류 항목이 삭제 되었습니다.");
+    				location.reload();
+    			}
+    		},
+    		error : function() {
+    			alert("전송오류!");
+    		}
+    	});
+    }
   </script>
 </head>
 <body>

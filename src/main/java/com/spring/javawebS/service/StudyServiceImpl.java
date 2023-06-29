@@ -31,6 +31,8 @@ import com.spring.javawebS.vo.MemberVO;
 import com.spring.javawebS.vo.QrCodeVO;
 import com.spring.javawebS.vo.UserVO;
 
+import net.coobird.thumbnailator.Thumbnailator;
+
 @Service
 public class StudyServiceImpl implements StudyService {
 
@@ -377,6 +379,39 @@ public class StudyServiceImpl implements StudyService {
 	@Override
 	public QrCodeVO getQrCodeSearch(String qrCode) {
 		return studyDAO.getQrCodeSearch(qrCode);
+	}
+
+	@Override
+	public int thumbnailCreate(MultipartFile file) {
+		int res = 0;
+		try {
+			UUID uid = UUID.randomUUID();
+			String strUid = uid.toString();
+			String oFileName = file.getOriginalFilename();
+			
+			String saveFileName = strUid.substring(strUid.lastIndexOf("-")+1) + "_" + oFileName;
+			
+			// 먼저 MultipartFile객체로 원본이미지를 저장하고, Thumbnailator객체로 썸네일 생성저장하기
+			HttpServletRequest request = ((ServletRequestAttributes)RequestContextHolder.currentRequestAttributes()).getRequest();
+			String realPath = request.getSession().getServletContext().getRealPath("/resources/data/thumbnail/");
+			File realFileName = new File(realPath + saveFileName);
+			file.transferTo(realFileName);	// 원본 이미지 저장하기
+			
+			// 썸네일 이미지 생성하기(썸네일파일명은 "s_"로 시작하도록처리);
+			String thumbnailSaveName = realPath + "s_" + saveFileName;
+			File thumbnailFile = new File(thumbnailSaveName);
+			
+			int width = 120;
+			int height = 160;
+			// 썸네일 라이브러리(Thumbnailator)를 이용한 썸네일 이미지 생성저장하기: createThumbnail(원본이미지,썸네일이미지,폭,높이)
+			Thumbnailator.createThumbnail(realFileName, thumbnailFile, width, height);
+			
+			res = 1;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return res;
 	}
 	
 }

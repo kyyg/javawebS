@@ -46,4 +46,6 @@ public interface StudyService {
 
 	public QrCodeVO getQrCodeSearch(String qrCode);
 
+	public int thumbnailCreate(MultipartFile file);
+
 }

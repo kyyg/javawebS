@@ -3,7 +3,6 @@ package com.spring.javawebS;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
-import java.awt.GraphicsEnvironment;
 import java.awt.RenderingHints;
 import java.awt.font.FontRenderContext;
 import java.awt.geom.Rectangle2D;
@@ -685,4 +684,43 @@ public class StudyController {
 		if(strCaptcha.equals(session.getAttribute("CAPTCHA").toString())) return "1";
 		else return "0";
 	}
+	
+	// 썸네일 이미지 연습폼
+	@RequestMapping(value = "/thumbnail/thumbnailForm", method = RequestMethod.GET)
+	public String thumbnailFormGet() {
+		return "study/thumbnail/thumbnailForm";
+	}
+	
+	// 썸네일 이미지 생성 하기
+	@RequestMapping(value = "/thumbnail/thumbnailForm", method = RequestMethod.POST)
+	public String thumbnailFormPost(MultipartFile file) {
+		int res = studyService.thumbnailCreate(file);
+		if(res == 1) return "redirect:/message/thumbnailCreateOk";
+		else return "redirect:/message/thumbnailCreateNo";
+	}
+	
+	// 썸네일 결과 보기
+	@RequestMapping(value = "/thumbnail/thumbnailResult", method = RequestMethod.GET)
+	public String thumbnailResultGet(HttpServletRequest request, Model model) {
+		String realPath = request.getSession().getServletContext().getRealPath("/resources/data/thumbnail/");
+		String[] files = new File(realPath).list();		
+		model.addAttribute("files", files);
+		model.addAttribute("cnt", (files.length / 2));
+		
+		return "study/thumbnail/thumbnailResult";
+	}
+	
+	// 썸네일 이미지 삭제하기
+	@ResponseBody
+	@RequestMapping(value = "/thumbnail/thumbnailDelete", method = RequestMethod.POST)
+	public String thumbnailDeletePost(HttpServletRequest request, String file, String thumbnailFile) {
+//		System.out.println("file : " + file);
+//		System.out.println("thumbnailFile : " + thumbnailFile);
+		String realPath = request.getSession().getServletContext().getRealPath("/resources/data/thumbnail/");
+		new File(realPath + file).delete();		
+		new File(realPath + thumbnailFile).delete();		
+		
+		return "1";
+	}
+	
 }
